@@ -1,0 +1,12 @@
+# 核心依赖（Python >= 3.10）
+trafilatura>=1.12        # 正文抽取（主）
+newspaper4k>=0.9.3       # 正文抽取（备）+ NLP 关键词/摘要
+feedparser>=6.0          # RSS 解析
+requests>=2.31           # HTTP 客户端
+PyYAML>=6.0              # 配置文件
+Jinja2>=3.1              # HTML 模板渲染
+APScheduler>=3.10        # 常驻调度（--serve 模式）
+python-dotenv>=1.0       # .env 加载
+jieba>=0.42              # 中文分词（供 TextRank 摘要使用）
+sumy>=0.11               # 抽取式摘要（TextRank/LSA）
+lxml>=5.0

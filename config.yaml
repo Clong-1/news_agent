@@ -1,0 +1,49 @@
+# ===== 新闻助手智能体配置 =====
+
+sources:
+  # 中文热榜：自托管 DailyHotApi（docker run -p 6688:6688 -d imsyy/dailyhot-api:latest）
+  hot_api:
+    enabled: false                        # 云端关闭，仅用 RSS 英文源
+    base_url: "http://localhost:6688"     # 本地运行需改为实际地址
+    endpoints: ["weibo", "zhihu", "baidu", "toutiao", "thepaper"]
+    top_n: 5                              # 每个榜单取前 N 条
+
+  # 英文 RSS 源
+  rss:
+    enabled: true
+    top_n: 4                             # 每个源取前 N 条（近 24 小时）
+    feeds:
+      - name: "BBC World"
+        url: "https://feeds.bbci.co.uk/news/world/rss.xml"
+      - name: "Reuters Top"
+        url: "https://feeds.reuters.com/reuters/topNews"
+      - name: "TechCrunch"
+        url: "https://techcrunch.com/feed/"
+      - name: "Google News AI"
+        url: "https://news.google.com/rss/search?q=artificial+intelligence&hl=en-US&gl=US&ceid=US:en"
+
+fetch:
+  max_workers: 8          # 并发抓取线程数
+  timeout: 15             # 单请求超时（秒）
+  min_text_len: 200       # 正文不足该长度则视为抽取失败，触发备用抽取器
+  user_agent: "NewsAgent/1.0 (+https://example.com; respectful bot)"
+
+summary:
+  method: "textrank"      # textrank | llm
+  sentences: 3            # 抽取式摘要句数
+  llm:                    # method=llm 时生效；失败自动回退 textrank
+    base_url: "https://api.openai.com/v1"   # 任意 OpenAI 兼容端点
+    model: "gpt-4o-mini"
+    max_tokens: 256
+
+render:
+  output_dir: "output"
+  archive_by_date: true   # 除 index.html 外另存 daily_YYYYMMDD.html
+
+mail:
+  enabled: true
+  subject_prefix: "每日新闻日报"
+  # SMTP 凭据从环境变量读取：SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS/MAIL_TO(逗号分隔)
+
+schedule:
+  cron: "30 8 * * *"      # 每日 08:30（--serve 模式生效）

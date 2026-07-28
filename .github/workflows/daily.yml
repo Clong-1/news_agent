@@ -1,0 +1,42 @@
+name: 每日新闻日报
+
+on:
+  schedule:
+    # 每日 08:30 北京时间 = 00:30 UTC（GitHub 定时可能有数分钟排队延迟）
+    - cron: "30 0 * * *"
+  workflow_dispatch:            # 允许手动触发调试
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 运行流水线（抓取 → 摘要 → 渲染 → 邮件）
+        env:
+          # SMTP 凭据从 GitHub Secrets 读取
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO:   ${{ secrets.MAIL_TO }}
+          # LLM 摘要（可选，config.yaml 中 method=textrank 则不填）
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: python main.py --once
+
+      - name: 发布日报到 gh-pages 分支（供 GitHub Pages 托管）
+        if: success()
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          keep_files: true
