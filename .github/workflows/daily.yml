@@ -6,6 +6,9 @@ on:
     - cron: "30 0 * * *"
   workflow_dispatch:            # 允许手动触发调试
 
+permissions:
+  contents: write               # gh-pages 推送需要写入权限
+
 jobs:
   digest:
     runs-on: ubuntu-latest
@@ -35,6 +38,7 @@ jobs:
 
       - name: 发布日报到 gh-pages 分支（供 GitHub Pages 托管）
         if: success()
+        continue-on-error: true   # Pages 发布失败不影响邮件，可单独排查
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
