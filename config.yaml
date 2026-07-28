@@ -84,11 +84,11 @@ filter:
         - 外交, 制裁, 法案, 立法, 军事, 国防, 国际
 
 summary:
-  method: "textrank"      # textrank | llm
+  method: "llm"           # textrank | llm
   sentences: 3            # 抽取式摘要句数
   llm:                    # method=llm 时生效；失败自动回退 textrank
-    base_url: "https://api.openai.com/v1"   # 任意 OpenAI 兼容端点
-    model: "gpt-4o-mini"
+    base_url: "https://api.deepseek.com/v1"   # 任意 OpenAI 兼容端点
+    model: "deepseek-chat"
     max_tokens: 256
 
 render:
