@@ -54,11 +54,12 @@ def run_once(config: dict) -> None:
     items = Summarizer(config).summarize_all(items)   # 4. 摘要
 
     date_str = datetime.now().strftime("%Y-%m-%d")
-    VoiceBriefing(config).generate(items, date_str)   # 5. 语音简报
+    audio_path = VoiceBriefing(config).generate(items, date_str)  # 5. 语音简报
 
     html_path = Renderer(config).render(items)        # 6. 网页
 
-    Mailer(config).send(html_path, items, date_str)   # 7. 邮件
+    Mailer(config).send(html_path, items, date_str,   # 7. 邮件（含语音附件）
+                        audio_path=audio_path)
 
     logger.info("=== 运行完成，耗时 %.1f 秒 ===",
                 (datetime.now() - start).total_seconds())

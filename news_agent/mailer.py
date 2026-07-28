@@ -5,9 +5,11 @@ import smtplib
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
 from email.utils import formataddr
+from email import encoders
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from .models import NewsItem
 
@@ -25,7 +27,8 @@ class Mailer:
         self.recipients = [m.strip() for m in
                            os.environ.get("MAIL_TO", "").split(",") if m.strip()]
 
-    def send(self, html_path: Path, items: List[NewsItem], date_str: str) -> bool:
+    def send(self, html_path: Path, items: List[NewsItem],
+             date_str: str, audio_path: Optional[Path] = None) -> bool:
         if not self.enabled:
             logger.info("邮件发送已在配置中关闭，跳过")
             return False
@@ -36,17 +39,39 @@ class Mailer:
         html_body = html_path.read_text(encoding="utf-8")
         text_body = self._plain_text(items, date_str)
 
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = Header(f"{self.prefix} {date_str}", "utf-8")
-        msg["From"] = formataddr((str(Header("新闻助手", "utf-8")), self.user))
-        msg["To"] = ", ".join(self.recipients)
-        msg.attach(MIMEText(text_body, "plain", "utf-8"))
-        msg.attach(MIMEText(html_body, "html", "utf-8"))
+        # 外层：mixed（支持附件）
+        outer = MIMEMultipart("mixed")
+        outer["Subject"] = Header(f"{self.prefix} {date_str}", "utf-8")
+        outer["From"] = formataddr((str(Header("新闻助手", "utf-8")), self.user))
+        outer["To"] = ", ".join(self.recipients)
+
+        # 内层：alternative（纯文本 + HTML）
+        alt = MIMEMultipart("alternative")
+        alt.attach(MIMEText(text_body, "plain", "utf-8"))
+        alt.attach(MIMEText(html_body, "html", "utf-8"))
+        outer.attach(alt)
+
+        # 附件：语音简报
+        if audio_path and audio_path.exists():
+            try:
+                with open(audio_path, "rb") as f:
+                    part = MIMEBase("audio", "mpeg")
+                    part.set_payload(f.read())
+                    encoders.encode_base64(part)
+                    part.add_header(
+                        "Content-Disposition",
+                        "attachment",
+                        filename=f"news_briefing_{date_str}.mp3",
+                    )
+                    outer.attach(part)
+                    logger.info("语音简报已附加到邮件: %s", audio_path.name)
+            except Exception as e:
+                logger.warning("语音附件添加失败: %s", e)
 
         try:
             with smtplib.SMTP_SSL(self.host, self.port, timeout=30) as smtp:
                 smtp.login(self.user, self.password)
-                smtp.sendmail(self.user, self.recipients, msg.as_string())
+                smtp.sendmail(self.user, self.recipients, outer.as_string())
             logger.info("邮件已发送至 %s", self.recipients)
             return True
         except Exception as e:
