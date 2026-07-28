@@ -8,25 +8,80 @@ sources:
     endpoints: ["weibo", "zhihu", "baidu", "toutiao", "thepaper"]
     top_n: 5                              # 每个榜单取前 N 条
 
-  # 英文 RSS 源
+  # RSS 源（中英文混合）
   rss:
     enabled: true
-    top_n: 4                             # 每个源取前 N 条（近 24 小时）
+    top_n: 5                             # 每个源取前 N 条（近 24 小时）
     feeds:
+      # 中文 RSS 源
+      - name: "知乎日报"
+        url: "https://daily.zhihu.com/story/rss"
+        lang: "zh"
+      - name: "36氪"
+        url: "https://36kr.com/feed"
+        lang: "zh"
+      - name: "机器之心"
+        url: "https://jiqizhixin.com/rss/synthesis"
+        lang: "zh"
+      - name: "Solidot"
+        url: "https://www.solidot.org/index.rss"
+        lang: "zh"
+      # 英文 RSS 源
       - name: "BBC World"
         url: "https://feeds.bbci.co.uk/news/world/rss.xml"
+        lang: "en"
       - name: "Reuters Top"
         url: "https://feeds.reuters.com/reuters/topNews"
+        lang: "en"
       - name: "TechCrunch"
         url: "https://techcrunch.com/feed/"
+        lang: "en"
       - name: "Google News AI"
         url: "https://news.google.com/rss/search?q=artificial+intelligence&hl=en-US&gl=US&ceid=US:en"
+        lang: "en"
 
 fetch:
   max_workers: 8          # 并发抓取线程数
   timeout: 15             # 单请求超时（秒）
   min_text_len: 200       # 正文不足该长度则视为抽取失败，触发备用抽取器
   user_agent: "NewsAgent/1.0 (+https://example.com; respectful bot)"
+
+filter:
+  enabled: true
+  match_on: "title+text"     # title | title+text（标题+正文更准）
+  categories:
+    - name: "AI"
+      keywords:
+        - ai, artificial intelligence, llm, gpt, agi, neural network
+        - 人工智能, 大模型, 机器学习, 深度学习, 生成式, 机器人
+        - openai, anthropic, deepseek, claude, chatgpt, gemini
+        - 算法, 模型训练, 推理, 智能体, agent
+    - name: "科技"
+      keywords:
+        - tech, technology, software, hardware, chip, semiconductor
+        - 科技, 芯片, 半导体, 手机, 数码, 苹果, 华为, 小米
+        - 云计算, 5g, 6g, 物联网, iot, 开源, 操作系统
+        - 微软, google, meta, 亚马逊, 特斯拉
+    - name: "汽车"
+      keywords:
+        - auto, car, vehicle, ev, electric vehicle, tesla, byd
+        - 汽车, 电动车, 新能源, 电池, 充电, 自动驾驶
+        - 发动机, 供应链, 小米汽车, 蔚来, 小鹏, 理想
+    - name: "金融"
+      keywords:
+        - finance, financial, bank, stock, investment, fund, ipo
+        - 金融, 银行, 股市, 投资, 基金, 理财, 降息, 加息
+        - 利率, 汇率, 外汇, 保险, 证券, 债券, 资本
+    - name: "财经"
+      keywords:
+        - economy, economic, market, trade, gdp, inflation
+        - 财经, 经济, 市场, 贸易, 关税, 出口, 消费
+        - 央行, 制造业, 房地产, 财政, 政策, 宏观
+    - name: "政治"
+      keywords:
+        - politics, government, election, president, congress
+        - 政治, 政府, 政策, 选举, 总统, 国会, 议会
+        - 外交, 制裁, 法案, 立法, 军事, 国防, 国际
 
 summary:
   method: "textrank"      # textrank | llm

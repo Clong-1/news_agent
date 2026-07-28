@@ -62,7 +62,7 @@ class Fetcher:
         return out
 
     def _from_rss(self) -> List[NewsItem]:
-        """英文 RSS：feedparser 解析，过滤近 24 小时"""
+        """RSS：feedparser 解析，过滤近 24 小时（支持中英文源，lang 从配置读取）"""
         rcfg = self.cfg["sources"]["rss"]
         top_n = rcfg.get("top_n", 4)
         cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
@@ -79,9 +79,10 @@ class Fetcher:
                     if pub and pub < cutoff:
                         continue  # 只保留近 24h
                     if getattr(e, "title", None) and getattr(e, "link", None):
+                        lang = feed.get("lang", "en")  # 每个源可单独指定语言
                         out.append(NewsItem(
                             title=e.title.strip(), url=e.link,
-                            source=feed["name"], lang="en", published=pub))
+                            source=feed["name"], lang=lang, published=pub))
                         count += 1
                     if count >= top_n:
                         break

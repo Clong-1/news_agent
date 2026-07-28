@@ -24,7 +24,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 运行流水线（抓取 → 摘要 → 渲染 → 邮件）
+      - name: 下载 NLTK 数据（供 TextRank 摘要使用）
+        run: python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt')"
+
+      - name: 运行流水线（抓取 → 筛选 → 摘要 → 渲染 → 邮件）
         env:
           # SMTP 凭据从 GitHub Secrets 读取
           SMTP_HOST: ${{ secrets.SMTP_HOST }}

@@ -15,6 +15,7 @@ import yaml
 from dotenv import load_dotenv
 
 from news_agent.fetcher import Fetcher
+from news_agent.filter import ContentFilter
 from news_agent.mailer import Mailer
 from news_agent.renderer import Renderer
 from news_agent.scheduler import serve
@@ -33,7 +34,7 @@ def load_config() -> dict:
 
 
 def run_once(config: dict) -> None:
-    """完整流水线：抓取 → 摘要 → 渲染 → 邮件"""
+    """完整流水线：抓取 → 正文 → 筛选 → 摘要 → 渲染 → 邮件"""
     start = datetime.now()
     logger.info("=== 新闻助手开始运行 ===")
 
@@ -44,11 +45,16 @@ def run_once(config: dict) -> None:
         return
     items = fetcher.enrich_all(items)  # 2. 正文抽取
 
-    items = Summarizer(config).summarize_all(items)   # 3. 摘要
+    items = ContentFilter(config).filter(items)   # 3. 内容筛选
+    if not items:
+        logger.error("筛选后无匹配新闻，终止本次运行")
+        return
 
-    html_path = Renderer(config).render(items)        # 4. 网页
+    items = Summarizer(config).summarize_all(items)   # 4. 摘要
 
-    Mailer(config).send(html_path, items,             # 5. 邮件
+    html_path = Renderer(config).render(items)        # 5. 网页
+
+    Mailer(config).send(html_path, items,             # 6. 邮件
                         datetime.now().strftime("%Y-%m-%d"))
 
     logger.info("=== 运行完成，耗时 %.1f 秒 ===",
