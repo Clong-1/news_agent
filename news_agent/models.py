@@ -25,6 +25,15 @@ class NewsItem:
     keywords: List[str] = field(default_factory=list)
 
     @property
+    def hot_fmt(self) -> str:
+        """热度人性化显示：1234567 → 123.5万"""
+        if not self.hot:
+            return ""
+        if self.hot >= 10000:
+            return f"{self.hot / 10000:.1f}万"
+        return str(self.hot)
+
+    @property
     def dedup_key(self) -> str:
         """去重键：规范化 URL + 标题"""
         import hashlib, re

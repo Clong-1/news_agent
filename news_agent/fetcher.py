@@ -69,7 +69,11 @@ class Fetcher:
         out = []
         for feed in rcfg.get("feeds", []):
             try:
-                d = feedparser.parse(feed["url"])
+                # 先用 requests 下载（带超时与 UA），再交给 feedparser 解析，
+                # 避免 feedparser 直连无超时控制导致单个失效源挂住整个流水线
+                r = self.session.get(feed["url"], timeout=self.timeout)
+                r.raise_for_status()
+                d = feedparser.parse(r.content)
                 count = 0
                 for e in d.entries:
                     pub = None

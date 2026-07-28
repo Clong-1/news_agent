@@ -93,6 +93,7 @@ summary:
 
 render:
   output_dir: "output"
+  template: "newspaper"   # newspaper=报纸版式(热度最高为头条) | daily=卡片版式
   archive_by_date: true   # 除 index.html 外另存 daily_YYYYMMDD.html
 
 mail:

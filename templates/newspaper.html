@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>每日新闻晨报 {{ date_str }}</title>
+</head>
+<!-- 报纸版式：table 布局 + 内联样式，衬线字体，兼顾邮件客户端 -->
+<body style="margin:0;padding:0;background:#e8e2d5;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e8e2d5;">
+<tr><td align="center" style="padding:28px 10px;">
+<table role="presentation" width="680" cellpadding="0" cellspacing="0" style="max-width:680px;width:100%;background:#f8f4ea;box-shadow:0 2px 10px rgba(60,50,35,.18);font-family:Georgia,'Times New Roman','Songti SC','SimSun','Noto Serif SC',serif;">
+
+  <!-- ===== 报头 ===== -->
+  <tr><td style="padding:26px 36px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="font-size:11.5px;color:#6b6152;letter-spacing:1px;vertical-align:bottom;">
+          {{ weekday_str }}<br>第 {{ issue_no }} 期
+        </td>
+        <td align="center" style="vertical-align:bottom;">
+          <div style="font-size:38px;font-weight:900;color:#1d1a14;letter-spacing:10px;line-height:1.1;">每日新闻晨报</div>
+          <div style="font-size:10.5px;color:#8a8071;letter-spacing:4px;margin-top:4px;">THE DAILY NEWS DIGEST</div>
+        </td>
+        <td align="right" style="font-size:11.5px;color:#6b6152;letter-spacing:1px;vertical-align:bottom;">
+          {{ date_str }}<br>今日 {{ total }} 条
+        </td>
+      </tr>
+    </table>
+    <div style="border-top:3px double #1d1a14;margin-top:12px;"></div>
+    <div style="border-top:1px solid #1d1a14;margin-top:2px;"></div>
+  </td></tr>
+
+  <!-- ===== 头条（热度最高） ===== -->
+  {% if headline %}
+  <tr><td style="padding:22px 36px 6px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr><td>
+        <span style="display:inline-block;background:#8c2f2f;color:#f8f4ea;font-size:11px;letter-spacing:3px;padding:3px 12px;">头 条</span>
+        <span style="font-size:11.5px;color:#6b6152;margin-left:10px;">{{ headline.source }}{% if headline.hot %} · 热度 {{ headline.hot_fmt }}{% endif %}</span>
+      </td></tr>
+      <tr><td style="padding-top:10px;">
+        <a href="{{ headline.url }}" style="font-size:27px;font-weight:900;color:#1d1a14;text-decoration:none;line-height:1.35;">{{ headline.title }}</a>
+      </td></tr>
+      {% if headline.summary %}
+      <tr><td style="padding-top:12px;">
+        <span style="float:left;font-size:44px;font-weight:900;color:#8c2f2f;line-height:.8;padding:4px 8px 0 0;">{{ headline.summary[0] }}</span>
+        <span style="font-size:14.5px;color:#3a352c;line-height:1.9;">{{ headline.summary[1:] }}</span>
+      </td></tr>
+      {% endif %}
+      {% if headline.keywords %}
+      <tr><td style="padding-top:10px;">
+        {% for kw in headline.keywords %}
+        <span style="font-size:11.5px;color:#8c2f2f;letter-spacing:1px;margin-right:12px;">◆ {{ kw }}</span>
+        {% endfor %}
+      </td></tr>
+      {% endif %}
+    </table>
+    <div style="border-bottom:1px solid #b8ad97;margin-top:18px;"></div>
+  </td></tr>
+  {% endif %}
+
+  <!-- ===== 次头条：第 2、3 名（双栏，中间竖线分隔） ===== -->
+  {% if sub_heads %}
+  <tr><td style="padding:16px 36px 4px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="48%" style="vertical-align:top;padding-right:16px;">
+          {% set item = sub_heads[0] %}
+          <a href="{{ item.url }}" style="font-size:17.5px;font-weight:700;color:#1d1a14;text-decoration:none;line-height:1.5;">{{ item.title }}</a>
+          <div style="font-size:11px;color:#6b6152;margin-top:6px;">{{ item.source }}{% if item.hot %} · 热度 {{ item.hot_fmt }}{% endif %}</div>
+          {% if item.summary %}
+          <div style="font-size:13px;color:#3a352c;line-height:1.8;margin-top:8px;">{{ item.summary }}</div>
+          {% endif %}
+        </td>
+        {% if sub_heads|length > 1 %}
+        <td width="1" style="border-left:1px solid #b8ad97;"></td>
+        <td width="48%" style="vertical-align:top;padding-left:16px;">
+          {% set item = sub_heads[1] %}
+          <a href="{{ item.url }}" style="font-size:17.5px;font-weight:700;color:#1d1a14;text-decoration:none;line-height:1.5;">{{ item.title }}</a>
+          <div style="font-size:11px;color:#6b6152;margin-top:6px;">{{ item.source }}{% if item.hot %} · 热度 {{ item.hot_fmt }}{% endif %}</div>
+          {% if item.summary %}
+          <div style="font-size:13px;color:#3a352c;line-height:1.8;margin-top:8px;">{{ item.summary }}</div>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+    </table>
+    <div style="border-bottom:1px solid #b8ad97;margin-top:16px;"></div>
+  </td></tr>
+  {% endif %}
+
+  <!-- ===== 要闻栏：其余中文新闻（双栏短讯） ===== -->
+  {% if zh_rest %}
+  <tr><td style="padding:16px 36px 4px;">
+    <div style="font-size:13px;font-weight:700;color:#1d1a14;letter-spacing:6px;border-bottom:2px solid #1d1a14;padding-bottom:6px;">要 闻</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+      {% for pair in zh_rest|batch(2) %}
+      <tr>
+        {% for item in pair %}
+        <td width="50%" style="vertical-align:top;padding:8px {% if loop.first %}14px 8px 0;border-right:1px solid #d8cfbb;{% else %}0 0 8px 14px;{% endif %}">
+          <a href="{{ item.url }}" style="font-size:14px;font-weight:700;color:#1d1a14;text-decoration:none;line-height:1.55;">{{ item.title }}</a>
+          <div style="font-size:10.5px;color:#8a8071;margin-top:4px;">{{ item.source }}{% if item.hot %} · {{ item.hot_fmt }}{% endif %}</div>
+          {% if item.summary %}
+          <div style="font-size:12.5px;color:#4a443a;line-height:1.75;margin-top:5px;">{{ item.summary }}</div>
+          {% endif %}
+        </td>
+        {% endfor %}
+        {% if pair|length == 1 %}<td width="50%"></td>{% endif %}
+      </tr>
+      {% endfor %}
+    </table>
+  </td></tr>
+  {% endif %}
+
+  <!-- ===== 国际版 ===== -->
+  {% if en_items %}
+  <tr><td style="padding:14px 36px 4px;">
+    <div style="font-size:13px;font-weight:700;color:#1d1a14;letter-spacing:3px;border-bottom:2px solid #1d1a14;padding-bottom:6px;">INTERNATIONAL <span style="font-size:10.5px;color:#8a8071;letter-spacing:1px;">国际版</span></div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+      {% for item in en_items %}
+      <tr><td style="vertical-align:top;padding:8px 0;border-bottom:1px dotted #c9bfa9;">
+        <a href="{{ item.url }}" style="font-size:14px;font-weight:700;color:#1d1a14;text-decoration:none;line-height:1.55;">{{ item.title }}</a>
+        <div style="font-size:10.5px;color:#8a8071;margin-top:4px;">{{ item.source }}{% if item.published %} · {{ item.published.strftime('%H:%M UTC') }}{% endif %}</div>
+        {% if item.summary %}
+        <div style="font-size:12.5px;color:#4a443a;line-height:1.75;margin-top:5px;">{{ item.summary }}</div>
+        {% endif %}
+      </td></tr>
+      {% endfor %}
+    </table>
+  </td></tr>
+  {% endif %}
+
+  <!-- ===== 报脚 ===== -->
+  <tr><td style="padding:18px 36px 24px;">
+    <div style="border-top:3px double #1d1a14;"></div>
+    <div style="font-size:10.5px;color:#8a8071;line-height:1.9;margin-top:10px;text-align:center;letter-spacing:1px;">
+      本报由 News Agent 自动编撰 · 排序依据全网热度 · 摘要仅供速览，著作权归原载媒体所有<br>
+      {% if degraded %}本期 {{ degraded }} 条快讯仅列标题 · {% endif %}电子存档 output/daily_{{ date_str.replace('-', '') }}.html
+    </div>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>
