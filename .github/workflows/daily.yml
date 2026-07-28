@@ -18,13 +18,21 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"                              # 缓存 pip 依赖，requirements.txt 不变时秒装
+          cache-dependency-path: requirements.txt
 
       - name: 安装依赖
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 下载 NLTK 数据（供 TextRank 摘要使用）
+      - name: 缓存 NLTK 语料数据
+        uses: actions/cache@v4
+        with:
+          path: ~/nltk_data
+          key: nltk-punkt-v1                        # 数据内容变化时递增版本号即可失效重建
+
+      - name: 下载 NLTK 数据（供 TextRank 摘要使用，缓存命中时秒过）
         run: python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt')"
 
       - name: 运行流水线（抓取 → 筛选 → 摘要 → 渲染 → 邮件）
