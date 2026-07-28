@@ -101,5 +101,9 @@ mail:
   subject_prefix: "每日新闻日报"
   # SMTP 凭据从环境变量读取：SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS/MAIL_TO(逗号分隔)
 
+voice:
+  enabled: true
+  max_items: 5              # 中英文各最多读几条，0=全部
+
 schedule:
   cron: "0 6 * * *"       # 每日 06:00（--serve 模式生效）
