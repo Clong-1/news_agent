@@ -20,7 +20,6 @@ from news_agent.mailer import Mailer
 from news_agent.renderer import Renderer
 from news_agent.scheduler import serve
 from news_agent.summarizer import Summarizer
-from news_agent.voice import VoiceBriefing
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,7 +34,7 @@ def load_config() -> dict:
 
 
 def run_once(config: dict) -> None:
-    """完整流水线：抓取 → 正文 → 筛选 → 摘要 → 语音 → 渲染 → 邮件"""
+    """完整流水线：抓取 → 正文 → 筛选 → 摘要 → 渲染 → 邮件"""
     start = datetime.now()
     logger.info("=== 新闻助手开始运行 ===")
 
@@ -53,12 +52,10 @@ def run_once(config: dict) -> None:
 
     items = Summarizer(config).summarize_all(items)   # 4. 摘要
 
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    VoiceBriefing(config).generate(items, date_str)   # 5. 语音简报
+    html_path = Renderer(config).render(items)        # 5. 网页
 
-    html_path = Renderer(config).render(items)        # 6. 网页
-
-    Mailer(config).send(html_path, items, date_str)   # 7. 邮件
+    Mailer(config).send(html_path, items,             # 6. 邮件
+                        datetime.now().strftime("%Y-%m-%d"))
 
     logger.info("=== 运行完成，耗时 %.1f 秒 ===",
                 (datetime.now() - start).total_seconds())
