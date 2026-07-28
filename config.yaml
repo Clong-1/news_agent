@@ -93,6 +93,11 @@ summary:
 
 render:
   output_dir: "output"
+
+pages:
+  # GitHub Pages 根地址（项目页：https://<用户名>.github.io/<仓库名>）
+  # 用于生成语音简报的公开播放链接与二维码；留空则邮件不显示语音入口
+  base_url: "https://clong-1.github.io/news_agent"
   template: "newspaper"   # newspaper=报纸版式(热度最高为头条) | daily=卡片版式
   archive_by_date: true   # 除 index.html 外另存 daily_YYYYMMDD.html
 

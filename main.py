@@ -56,7 +56,19 @@ def run_once(config: dict) -> None:
     date_str = datetime.now().strftime("%Y-%m-%d")
     audio_path = VoiceBriefing(config).generate(items, date_str)  # 5. 语音简报
 
-    html_path = Renderer(config).render(items)        # 6. 网页
+    # 语音已生成且配置了 Pages 地址 → 拼公开链接 + 生成二维码（随 output/ 发布）
+    voice_url, qr_url = "", ""
+    pages_base = config.get("pages", {}).get("base_url", "").rstrip("/")
+    if audio_path and pages_base:
+        voice_url = f"{pages_base}/{audio_path.name}"
+        qr_path = VoiceBriefing.make_qr(
+            voice_url,
+            audio_path.parent / f"qr_{date_str.replace('-', '')}.png")
+        if qr_path:
+            qr_url = f"{pages_base}/{qr_path.name}"
+
+    html_path = Renderer(config).render(               # 6. 网页（含语音入口）
+        items, voice_url=voice_url, qr_url=qr_url)
 
     Mailer(config).send(html_path, items, date_str,   # 7. 邮件（含语音附件）
                         audio_path=audio_path)

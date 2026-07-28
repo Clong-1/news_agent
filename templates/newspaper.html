@@ -31,6 +31,27 @@
     <div style="border-top:1px solid #1d1a14;margin-top:2px;"></div>
   </td></tr>
 
+  <!-- ===== 听日报横幅（语音简报已发布时显示） ===== -->
+  {% if voice_url %}
+  <tr><td style="padding:16px 36px 0;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#efe6d6;border:1px solid #d8cfbb;">
+      <tr>
+        <td style="padding:12px 18px;vertical-align:middle;">
+          <div style="font-size:14px;font-weight:700;color:#8a5a3b;letter-spacing:2px;">🎧 听日报</div>
+          <div style="font-size:11.5px;color:#6b6152;margin-top:4px;line-height:1.6;">今日语音简报已上线，通勤路上听新闻</div>
+          <a href="{{ voice_url }}" style="display:inline-block;margin-top:8px;background:#8c2f2f;color:#f8f4ea;font-size:12px;letter-spacing:2px;padding:6px 16px;text-decoration:none;">▶ 立即收听</a>
+        </td>
+        {% if qr_url %}
+        <td width="100" align="right" style="padding:12px 18px;vertical-align:middle;">
+          <img src="{{ qr_url }}" width="86" height="86" alt="扫码收听语音简报" style="display:block;border:1px solid #b8ad97;">
+          <div style="font-size:10px;color:#8a8071;margin-top:4px;text-align:center;">扫码收听</div>
+        </td>
+        {% endif %}
+      </tr>
+    </table>
+  </td></tr>
+  {% endif %}
+
   <!-- ===== 头条（热度最高） ===== -->
   {% if headline %}
   <tr><td style="padding:22px 36px 6px;">

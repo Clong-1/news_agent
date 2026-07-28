@@ -74,6 +74,23 @@ class VoiceBriefing:
         """去掉文本中的网址，TTS 不会把它读出来"""
         return re.sub(r'https?://[^\s,。，）)]+', '', text).strip()
 
+    @staticmethod
+    def make_qr(url: str, out_path: Path) -> Optional[Path]:
+        """为语音链接生成二维码 PNG（随 output/ 发布到 gh-pages 供邮件引用）"""
+        try:
+            import qrcode
+        except ImportError:
+            logger.warning("qrcode 未安装，跳过二维码生成：pip install qrcode[pil]")
+            return None
+        try:
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            qrcode.make(url).save(str(out_path))
+            logger.info("语音二维码已生成: %s", out_path)
+            return out_path
+        except Exception as e:
+            logger.warning("二维码生成失败: %s", e)
+            return None
+
     # ------------------------------------------------------------------
 
     def _zh_script(self, items: List[NewsItem], date_str: str) -> str:

@@ -30,10 +30,13 @@ class Renderer:
         self.env.filters["batch"] = lambda seq, n: [
             seq[i:i + n] for i in range(0, len(seq), n)]
 
-    def render(self, items: List[NewsItem]) -> Path:
+    def render(self, items: List[NewsItem],
+               voice_url: str = "", qr_url: str = "") -> Path:
+        """渲染日报网页；voice_url/qr_url 非空时模板显示"听日报"入口"""
         self.out_dir.mkdir(parents=True, exist_ok=True)
         now = datetime.now()
         context = self._build_context(items, now)
+        context.update(voice_url=voice_url, qr_url=qr_url)
         html = self.env.get_template(f"{self.template}.html").render(**context)
         index = self.out_dir / "index.html"
         index.write_text(html, encoding="utf-8")
