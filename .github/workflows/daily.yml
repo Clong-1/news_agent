@@ -2,8 +2,8 @@ name: 每日新闻日报
 
 on:
   schedule:
-    # 每日 08:30 北京时间 = 00:30 UTC（GitHub 定时可能有数分钟排队延迟）
-    - cron: "30 0 * * *"
+    # 每日 06:00 北京时间 = 22:00 UTC（GitHub 定时可能有数分钟排队延迟）
+    - cron: "0 22 * * *"
   workflow_dispatch:            # 允许手动触发调试
 
 permissions:

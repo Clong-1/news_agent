@@ -101,4 +101,4 @@ mail:
   # SMTP 凭据从环境变量读取：SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS/MAIL_TO(逗号分隔)
 
 schedule:
-  cron: "30 8 * * *"      # 每日 08:30（--serve 模式生效）
+  cron: "0 6 * * *"       # 每日 06:00（--serve 模式生效）
