@@ -88,7 +88,7 @@ summary:
   sentences: 3            # 抽取式摘要句数
   llm:                    # method=llm 时生效；失败自动回退 textrank
     base_url: "https://api.deepseek.com/v1"   # 任意 OpenAI 兼容端点
-    model: "deepseek-v4-pro"
+    model: "deepseek-chat"
     max_tokens: 256
 
 render:
