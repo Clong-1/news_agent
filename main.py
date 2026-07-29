@@ -21,6 +21,7 @@ from news_agent.renderer import Renderer
 from news_agent.scheduler import serve
 from news_agent.summarizer import Summarizer
 from news_agent.voice import VoiceBriefing
+from news_agent.wechat_push import WeChatPusher
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +73,9 @@ def run_once(config: dict) -> None:
 
     Mailer(config).send(html_path, items, date_str,   # 7. 邮件（含语音附件）
                         audio_path=audio_path)
+
+    pages_base = config.get("pages", {}).get("base_url", "").rstrip("/")
+    WeChatPusher(config).send(items, date_str, pages_base)  # 8. 微信推送
 
     logger.info("=== 运行完成，耗时 %.1f 秒 ===",
                 (datetime.now() - start).total_seconds())

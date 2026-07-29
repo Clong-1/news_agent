@@ -45,6 +45,8 @@ jobs:
           MAIL_TO:   ${{ secrets.MAIL_TO }}
           # LLM 摘要（可选，config.yaml 中 method=textrank 则不填）
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          # 微信推送 PushPlus Token
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
         run: python main.py --once
 
       - name: 发布日报到 gh-pages 分支（供 GitHub Pages 托管）

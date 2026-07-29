@@ -110,5 +110,9 @@ voice:
   enabled: true
   max_items: 5              # 中英文各最多读几条，0=全部
 
+wechat:
+  enabled: true
+  max_items: 10             # 微信中最多展示几条新闻
+
 schedule:
   cron: "0 6 * * *"       # 每日 06:00（--serve 模式生效）
