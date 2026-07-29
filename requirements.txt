@@ -9,6 +9,7 @@ APScheduler>=3.10        # 常驻调度（--serve 模式）
 python-dotenv>=1.0       # .env 加载
 jieba>=0.42              # 中文分词（供 TextRank 摘要使用）
 sumy>=0.11               # 抽取式摘要（TextRank/LSA）
+numpy>=1.24              # sumy LexRank 依赖
 lxml>=5.0
 edge-tts>=7.0          # 语音简报 TTS 引擎
 qrcode[pil]>=7.4         # 语音链接二维码生成
